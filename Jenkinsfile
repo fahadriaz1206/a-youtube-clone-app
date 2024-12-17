@@ -42,6 +42,25 @@ pipeline {
              steps {
                  sh "trivy fs . > trivyfs.txt"
              }
-         }   
+        }   
+
+        stage("Docker Build & Push"){
+             steps{
+                 script{
+                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
+                      sh "docker build -t youtube-clone ."
+                      sh "docker tag youtube-clone fahad1206/youtube-clone:latest "
+                      sh "docker push fahad1206/youtube-clone:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY Image Scan"){
+            steps{
+                sh "trivy image fahad1206/youtube-clone:latest > trivyimage.txt" 
+            }
+        }
+
+        
     }
 }
